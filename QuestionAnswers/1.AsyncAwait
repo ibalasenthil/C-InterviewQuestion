@@ -1,0 +1,82 @@
+1. Start with the Problem: Blocking Code
+In traditional synchronous programming, when we make a long-running operation, like calling a web API, reading a file, or querying a database, the thread executing that code gets blocked. This means it cannot do anything else until the operation finishes. For example:
+
+csharp
+Copy code
+public string GetData()
+{
+    // Simulate a long-running operation
+    var data = GetDataFromDatabase();
+    return data;
+}
+In this case, the thread is blocked while GetDataFromDatabase() is being executed, meaning it can't handle any other work.
+
+2. Introduce Async Programming: The Solution
+To solve this problem of blocking, asynchronous programming was introduced. In C#, we use the async and await keywords to make methods non-blocking. This allows the program to continue doing other work while waiting for the long-running task to complete.
+
+3. Explain async and await:
+async: This keyword is added to a method to mark it as asynchronous. It tells the compiler that this method may contain await statements and can run without blocking the main thread.
+
+await: This is used inside an async method to pause the execution of the method until the awaited task is complete. But instead of blocking the thread, it allows the method to continue executing on the same thread or resume later when the task finishes.
+
+Here’s an example to illustrate:
+
+csharp
+Copy code
+public async Task<string> GetDataAsync()
+{
+    // Call an asynchronous method
+    var data = await GetDataFromDatabaseAsync();
+    
+    // This line will run once the above task completes
+    return data;
+}
+When we call await GetDataFromDatabaseAsync(), the method pauses at that point, allowing the program to do other work. Once the GetDataFromDatabaseAsync() task finishes, execution resumes.
+4. Non-blocking Advantage:
+One of the key benefits of async and await is that it prevents blocking of threads. In a web application, for example, if you use await in a controller method that queries a database, the thread is freed up to handle other requests while the database operation runs in the background.
+
+This is highly beneficial for scalability—especially in web servers that need to handle many requests.
+
+5. Example: Without and With Async
+Here’s an example of a synchronous method:
+
+csharp
+Copy code
+public string FetchData()
+{
+    var data = GetDataFromAPI();  // This blocks the thread
+    return data;
+}
+The same example with async and await:
+
+csharp
+Copy code
+public async Task<string> FetchDataAsync()
+{
+    var data = await GetDataFromAPIAsync();  // This doesn't block the thread
+    return data;
+}
+In the FetchDataAsync method, the call to GetDataFromAPIAsync() will not block the thread. The thread can go off and do something else while waiting for the API response, which improves responsiveness and performance.
+
+6. Common Use Cases:
+Web applications: async and await are commonly used in web applications to handle database calls, API requests, or I/O-bound operations to ensure scalability and responsiveness.
+UI applications: In desktop applications (like WPF or WinForms), async and await help to avoid blocking the UI thread, keeping the interface responsive even when performing long operations.
+7. Important Points:
+Tasks, not Threads: async methods don’t create new threads. Instead, they allow the method to run without blocking the current thread while waiting for the task to finish.
+
+Return Types: An async method must return either:
+
+Task for void methods (when you don’t expect a result),
+Task<T> for methods returning a result (like Task<string>),
+void (only for event handlers).
+Exception Handling: When working with async and await, exceptions thrown in asynchronous code are captured and propagated through the Task object. You can handle them using try-catch like in regular methods.
+
+8. How It Works Under the Hood:
+You can also explain that under the hood, await creates a state machine that handles resuming the method at the point where it left off when the awaited task is complete.
+
+9. Final Summary:
+To wrap up, you can say:
+
+async and await are key features in C# for writing asynchronous, non-blocking code.
+They allow you to make your program more responsive by freeing up threads during long-running operations, whether you're building web applications, desktop applications, or performing I/O-bound tasks.
+This results in better performance, especially when dealing with tasks like database queries, web requests, or file operations.
